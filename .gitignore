@@ -1,4 +1,5 @@
 *.DS_Store
 *.pyci
-*.ideai
+*.idea
+*tmp
 *__pycache__

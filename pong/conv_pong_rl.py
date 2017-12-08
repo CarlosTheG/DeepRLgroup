@@ -28,9 +28,11 @@ init = tf.initialize_all_variables()
 # Set learning parameters
 y = .99
 e = 0.1
-num_episodes = 50
+num_episodes = 1
 #create lists to contain total rewards and steps per episode
 rList = [] # total rewards
+
+saver = tf.train.Saver()
 
 with tf.Session() as sess:
     sess.run(init)
@@ -72,5 +74,8 @@ with tf.Session() as sess:
                 env.render()
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
+
+    save_path = saver.save(sess, "/tmp/model.ckpt")
+
 
 # plt.plot(rList)
