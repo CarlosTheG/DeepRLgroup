@@ -62,6 +62,8 @@ with tf.Session() as sess:
                 #Reduce chance of random action as we train the model.
                 e = 1./((i/50) + 10)
                 break
+            if i >= 1000:
+                env.render()
         jList.append(j)
         rList.append(rAll)
         if i % 100 == 0:
