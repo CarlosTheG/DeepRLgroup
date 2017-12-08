@@ -5,6 +5,7 @@ Runs a Pong Q Learned network
 import gym
 import matplotlib.pyplot as plt
 import time
+import utils
 
 env = gym.make('Pong-v0')
 state = env.reset()
@@ -14,17 +15,23 @@ print (env.action_space)
 # 210x160x3 input image
 print (env.observation_space)
 
-
-
 for i in range(20):
-    #plt.imshow(s)
-    # take a random action. Returns state which is new game state
-    state, reward, done, _ = env.step(env.action_space.sample())
-    env.render()
-    # plt.imshow(state)
-    # plt.show()
+    env.step(0)
 
-env.close()
+state,r,d,_ = env.step(env.action_space.sample())
+formatted = utils.format_state(state, utils.GRAY)
+plt.imshow(formatted, cmap = plt.get_cmap('gray'))
+plt.show()
+
+# for i in range(5):
+#     #plt.imshow(s)
+#     # take a random action. Returns state which is new game state
+#     state, reward, done, _ = env.step(env.action_space.sample())
+#     env.render()
+#     plt.imshow(state)
+# plt.show()
+#
+# env.close()
 
 
 
@@ -39,3 +46,15 @@ def test_actions():
             env.step(i)
             env.render()
             time.sleep(0.2)
+
+'''
+1 reward for winning a round
+-1 for losing a round
+'''
+def test_rewards():
+    for i in range(5000):
+        state, reward, done, _ = env.step(env.action_space.sample())
+        if reward > 0.0:
+            print(reward)
+            plt.imshow(state)
+            plt.show()
