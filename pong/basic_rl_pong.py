@@ -32,7 +32,8 @@ init = tf.initialize_all_variables()
 # Set learning parameters
 y = .99
 e = 0.1
-num_episodes = 1
+
+num_episodes = 2000
 #create lists to contain total rewards and steps per episode
 jList = [] # steps per episode
 rList = [] # total rewards
@@ -62,6 +63,7 @@ with tf.Session() as sess:
                 a[0] = np.random.choice(3,1)
             #Get new state and reward from environment
             s1,r,d,_ = env.step(output_to_action[a[0]]) #observation, reward, done, info
+            r = utils.convert_reward(r, a)
             #Obtain the Q' values by feeding the new state through our network
             new_state = utils.format_state(s1, utils.GRAY)
             Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
@@ -78,17 +80,16 @@ with tf.Session() as sess:
                 #Reduce chance of random action as we train the model.
                 e = 1./((i/50) + 10)
                 break
-            # if i == num_episodes-1:
-            #     env.render()
+
+            if i % 25 == 0:
+                env.render()
+
         jList.append(j)
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
 
     if save:
         save_path = saver.save(sess, "./tmp/" + save_name)
-
-#print (W.eval())
-
 
 # plt.plot(rList)
 # plt.plot(jList)

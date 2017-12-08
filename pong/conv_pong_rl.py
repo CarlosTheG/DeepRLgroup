@@ -6,15 +6,6 @@ import matplotlib.pyplot as plt
 import utils
 # matplotlib inline
 
-def convert_reward(r):
-    r = 100.0 if r == 1.0 else r
-    r = -10.0 if r == -1.0 else r
-    if a[0] == 0 and r == 0:
-        r = 0.5
-    elif a[0] != 0 and r == 0:
-        r = 0.4
-    return r
-
 output_to_action = {0:0,1:2,2:3}
 env = gym.make('Pong-v0')
 tf.reset_default_graph()
@@ -30,7 +21,7 @@ predict = tf.argmax(Qout,1)
 #Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
 nextQ = tf.placeholder(shape=[1,3],dtype=tf.float32)
 loss = tf.reduce_sum(tf.square(nextQ - Qout))
-trainer = tf.train.GradientDescentOptimizer(learning_rate=0.1)
+trainer = tf.train.AdamOptimizer(learning_rate=0.1)
 updateModel = trainer.minimize(loss)
 
 init = tf.initialize_all_variables()
@@ -64,7 +55,7 @@ with tf.Session() as sess:
                 a[0] = np.random.choice(3,1)
             #Get new state and reward from environment
             s1,r,d,_ = env.step(output_to_action[a[0]]) #observation, reward, done, info
-            r = convert_reward(r)
+            r = utils.convert_reward(r, a)
             #Obtain the Q' values by feeding the new state through our network
             new_state = utils.format_state(s1, utils.GRAY)
             Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
