@@ -1,2 +1,4 @@
 *.DS_Store
-*.pyc
+*.pyci
+*.ideai
+*__pycache__
