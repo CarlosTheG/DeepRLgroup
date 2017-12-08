@@ -10,9 +10,9 @@ def convert_reward(r):
     r = 100.0 if r == 1.0 else r
     r = -10.0 if r == -1.0 else r
     if a[0] == 0 and r == 0:
-        r = 3
+        r = 0.5
     elif a[0] != 0 and r == 0:
-        r = 1
+        r = 0.4
     return r
 
 output_to_action = {0:0,1:2,2:3}
@@ -21,8 +21,10 @@ tf.reset_default_graph()
 
 #These lines establish the feed-forward part of the network used to choose actions
 inputs = tf.placeholder(shape=[1,160*160],dtype=tf.float32)
-W = tf.Variable(tf.random_uniform([160*160,3],0,0.01))
-Qout = tf.matmul(inputs,W)
+W1 = tf.Variable(tf.random_uniform([160*160,2000],0,0.01))
+out1 = tf.matmul(inputs, W1)
+W2 = tf.Variable(tf.random_uniform([2000, 3],0,0.01))
+Qout = tf.matmul(out1,W2)
 predict = tf.argmax(Qout,1)
 
 #Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
@@ -69,8 +71,9 @@ with tf.Session() as sess:
             targetQ = allQ
             targetQ[0,a[0]] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
             #Train our network using target and predicted Q values
-            _,W1 = sess.run([updateModel,W],
+            _,_,_ = sess.run([updateModel,W1,W2],
                 feed_dict={inputs:[formatted_input.flatten()],nextQ:targetQ})
+            print (str(W1.eval()))
             rAll += r
             s = s1
             if d == True:

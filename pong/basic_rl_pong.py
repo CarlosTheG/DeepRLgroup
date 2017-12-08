@@ -19,14 +19,14 @@ predict = tf.argmax(Qout,1)
 #Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
 nextQ = tf.placeholder(shape=[1,3],dtype=tf.float32)
 loss = tf.reduce_sum(tf.square(nextQ - Qout))
-trainer = tf.train.GradientDescentOptimizer(learning_rate=0.1)
+trainer = tf.train.AdamOptimizer(learning_rate=0.1)
 updateModel = trainer.minimize(loss)
 
 init = tf.initialize_all_variables()
 # Set learning parameters
 y = .99
 e = 0.1
-num_episodes = 50
+num_episodes = 20
 #create lists to contain total rewards and steps per episode
 jList = [] # steps per episode
 rList = [] # total rewards
@@ -74,7 +74,7 @@ with tf.Session() as sess:
         print ("Reward for round", i, "is :", rAll)
 
 
-
+print (W.eval())
 
 
 # plt.plot(rList)

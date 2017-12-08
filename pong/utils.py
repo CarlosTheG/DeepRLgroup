@@ -24,3 +24,7 @@ def format_state(state, form=ORIGINAL):
             gray = np.dot(shrunken[...,:3], [0.299, 0.587, 0.114])
             return gray
     raise Exception("BINARY FORM NOT IMPLEMENTED YET!!")
+
+
+def normalize(np_arr):
+    return np_arr / np_arr.sum()
