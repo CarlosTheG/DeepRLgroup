@@ -30,7 +30,6 @@ y = .99
 e = 0.1
 num_episodes = 50
 #create lists to contain total rewards and steps per episode
-jList = [] # steps per episode
 rList = [] # total rewards
 
 with tf.Session() as sess:
@@ -41,10 +40,8 @@ with tf.Session() as sess:
         s = env.reset()
         rAll = 0 # total reward
         d = False # whether or not to reduce chance of random action after training model
-        j = 0
         #The Q-Network
-        while j < 1000:
-            j+=1
+        while True:
             #Choose an action by greedily (with e chance of random action) from the Q-network
             formatted_input = utils.format_state(s, utils.GRAY)
             a,allQ = sess.run([predict,Qout],
@@ -73,13 +70,7 @@ with tf.Session() as sess:
                 break
             if i == num_episodes-1:
                 env.render()
-        jList.append(j)
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
 
-
-
-
-
 # plt.plot(rList)
-# plt.plot(jList)
