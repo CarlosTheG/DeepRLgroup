@@ -15,14 +15,6 @@ print (env.action_space)
 # 210x160x3 input image
 print (env.observation_space)
 
-for i in range(20):
-    env.step(0)
-
-state,r,d,_ = env.step(env.action_space.sample())
-formatted = utils.format_state(state, utils.GRAY)
-plt.imshow(formatted, cmap = plt.get_cmap('gray'))
-plt.show()
-
 # for i in range(5):
 #     #plt.imshow(s)
 #     # take a random action. Returns state which is new game state
