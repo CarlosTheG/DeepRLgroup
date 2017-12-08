@@ -6,6 +6,12 @@ import matplotlib.pyplot as plt
 import utils
 # matplotlib inline
 
+# OPTIONS
+save_name = 'save'
+save = True
+restore_name = 'save'
+restore = False
+
 output_to_action = {0:0,1:2,2:3}
 env = gym.make('Pong-v0')
 tf.reset_default_graph()
@@ -26,13 +32,18 @@ init = tf.initialize_all_variables()
 # Set learning parameters
 y = .99
 e = 0.1
-num_episodes = 20
+num_episodes = 1
 #create lists to contain total rewards and steps per episode
 jList = [] # steps per episode
 rList = [] # total rewards
 
+saver = tf.train.Saver()
+
 with tf.Session() as sess:
-    sess.run(init)
+    if restore:
+        saver.restore(sess, "/tmp/" + restore_name)
+    else:
+        sess.run(init)
     print('session initiated')
     for i in range(num_episodes):
         #Reset environment and get first new observation
@@ -67,14 +78,16 @@ with tf.Session() as sess:
                 #Reduce chance of random action as we train the model.
                 e = 1./((i/50) + 10)
                 break
-            if i == num_episodes-1:
-                env.render()
+            # if i == num_episodes-1:
+            #     env.render()
         jList.append(j)
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
 
+    if save:
+        save_path = saver.save(sess, "./tmp/" + save_name)
 
-print (W.eval())
+#print (W.eval())
 
 
 # plt.plot(rList)
