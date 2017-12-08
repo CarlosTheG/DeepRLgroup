@@ -22,7 +22,6 @@ print (env.observation_space)
 #     env.render()
 #     plt.imshow(state)
 # plt.show()
-#
 # env.close()
 
 
