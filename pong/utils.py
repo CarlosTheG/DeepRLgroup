@@ -25,6 +25,17 @@ def format_state(state, form=ORIGINAL):
             return gray
     raise Exception("BINARY FORM NOT IMPLEMENTED YET!!")
 
+'''
+Converts the environment reward into our RL algorithm reward.
+'''
+def convert_reward(r, a):
+    r = 100.0 if r == 1.0 else r
+    r = -10.0 if r == -1.0 else r
+    if a[0] == 0 and r == 0:
+        r = 0.5
+    elif a[0] != 0 and r == 0:
+        r = 0.4
+    return r
 
 def normalize(np_arr):
     return np_arr / np_arr.sum()
