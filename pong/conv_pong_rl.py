@@ -88,13 +88,13 @@ wc1 = weight_variable([10,10,1,32]) # filter: width, height, numchannels, numfil
 bc1 = bias_variable([32])
 hc1 = tf.nn.relu(conv2d(inputs, wc1, [1,4,4,1]) + bc1) # batch stride stride depth
 
-wc2 = weight_variable([5,5,32,64]) # filter: width, height, numchannels, numfilters
-bc2 = bias_variable([64])
+wc2 = weight_variable([5,5,32,32]) # filter: width, height, numchannels, numfilters
+bc2 = bias_variable([32])
 hc2 = tf.nn.relu(conv2d(hc1, wc2, [1,2,2,1]) + bc2) # batch stride stride depth
 
-wfc1 = weight_variable([25600, 1024])
+wfc1 = weight_variable([25600/2, 1024])
 bfc1 = bias_variable([1024])
-hc2_flat = tf.reshape(hc2, [-1,25600])
+hc2_flat = tf.reshape(hc2, [-1,25600/2])
 hfc1 = tf.nn.relu(tf.matmul(hc2_flat, wfc1) + bfc1)
 
 wfc2 = weight_variable([1024, 3])
