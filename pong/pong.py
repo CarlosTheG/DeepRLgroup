@@ -15,12 +15,16 @@ print (env.action_space)
 # 210x160x3 input image
 print (env.observation_space)
 
-# for i in range(5):
-#     #plt.imshow(s)
-#     # take a random action. Returns state which is new game state
-#     state, reward, done, _ = env.step(env.action_space.sample())
-#     env.render()
-#     plt.imshow(state)
+for i in range(20):
+    _ = env.step(0)
+
+for i in range(5):
+    #plt.imshow(s)
+    # take a random action. Returns state which is new game state
+    state, reward, done, _ = env.step(env.action_space.sample())
+    #env.render()
+    plt.imshow(state)
+    plt.show()
 # plt.show()
 # env.close()
 
