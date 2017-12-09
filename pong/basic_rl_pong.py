@@ -33,7 +33,7 @@ init = tf.initialize_all_variables()
 y = .99
 e = 0.1
 
-num_episodes = 2000
+num_episodes = 6000
 #create lists to contain total rewards and steps per episode
 rList = [] # total rewards
 
@@ -79,7 +79,7 @@ with tf.Session() as sess:
                 e = 1./((i/50) + 10)
                 break
 
-            if i % 25 == 0:
+            if i % 50 == 0:
                 env.render()
 
         rList.append(rAll)
@@ -88,4 +88,5 @@ with tf.Session() as sess:
     if save:
         save_path = saver.save(sess, "./tmp/" + save_name)
 
+print (rList)
 # plt.plot(rList)
