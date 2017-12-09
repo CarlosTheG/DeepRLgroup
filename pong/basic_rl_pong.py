@@ -14,7 +14,7 @@ restore = False
 
 output_to_action = {0:0,1:2,2:3}
 env = gym.make('Pong-v0')
-tf.reset_default_graph()
+tf.reset_default_graph()b
 
 #These lines establish the feed-forward part of the network used to choose actions
 inputs = tf.placeholder(shape=[1,160*160],dtype=tf.float32)
