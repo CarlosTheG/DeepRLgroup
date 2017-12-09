@@ -13,36 +13,31 @@ print (env.action_space)
 # 8 length vector
 print (env.observation_space)
 
-while True:
-    state,reward,d,_ = env.step(env.action_space.sample())
-    print (str(state))
-    if d == True:
-        break
-    env.render()
-
-# for i in range(5):
-#     #plt.imshow(s)
-#     # take a random action. Returns state which is new game state
-#     state, reward, done, _ = env.step(env.action_space.sample())
-#     #env.render()
-#     plt.imshow(state)
-#     plt.show()
-# plt.show()
-# env.close()
-
+# while True:
+#     state,reward,d,_ = env.step(env.action_space.sample())
+#     print (str(state))
+#     if d == True:
+#         break
+#     env.render()
+#     time.sleep(0.1)
 
 
 '''
 0 nothing, 1 fire main engine ,2, fire right engine, 3 left engine
 '''
 def test_actions():
-    env.reset()
     for i in range(0, 4, 1):
         print ("testing action: ", i)
-        for j in range(15):
-            env.step(i)
+        env.reset()
+        for j in range(200):
+            state,r,d,_ = env.step(i)
             env.render()
             time.sleep(0.1)
+            if d == True:
+                break
+            print (str(state))
+test_actions()
+
 
 '''
 Firing main engine is -0.3 each frame
