@@ -70,6 +70,8 @@ with tf.Session() as sess:
         #Reset environment and get first new observation
         s = env.reset()
         e = epsilons[i]
+        #Reduce chance of random action as we train the model.
+        # e = 4./((i/200) + 10)
         rAll = 0 # total reward
         j = 0
         #The Q-Network
