@@ -120,6 +120,7 @@ with tf.Session() as sess:
                 if d == True:
                     break
                 env.render()
+                time.sleep(0.1)
 
 
     if save:
