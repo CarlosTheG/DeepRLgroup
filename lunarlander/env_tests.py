@@ -23,7 +23,7 @@ print (env.observation_space)
 
 
 '''
-0 nothing, 1 fire left engine ,2 fire right engine, 3 left engine
+0 nothing, 1 fire left engine, 2 fire right engine, 3 left engine
 '''
 def test_actions():
     for i in range(0, 4, 1):

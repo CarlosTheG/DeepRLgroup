@@ -5,5 +5,5 @@ def format_state(s, params=None):
 
 def get_reward(r,s,a):
     if a[0] == 2:
-        return r + 0.3
+        return r + 0.4
     return r

@@ -64,7 +64,6 @@ with tf.Session() as sess:
         #Reset environment and get first new observation
         s = env.reset()
         rAll = 0 # total reward
-        d = False # whether or not to reduce chance of random action after training model
         j = 0
         #The Q-Network
         while j < 3000:
@@ -96,10 +95,10 @@ with tf.Session() as sess:
                 summary_writer.add_summary(summary_str, i)
                 summary_writer.flush()
                 #Reduce chance of random action as we train the model.
-                e = 1./((i/50) + 10)
+                e = 1./((i/100) + 10)
                 break
 
-            if i % 250 == 0:
+            if i % 100 == 0 and i > 1500:
                 env.render()
 
         rList.append(rAll)
