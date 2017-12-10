@@ -17,7 +17,7 @@ save = True
 restore_name = 'save'
 restore = False
 
-VISUALIZE = False
+VISUALIZE = True
 
 
 env = gym.make('LunarLander-v2')
@@ -28,11 +28,9 @@ inputs = tf.placeholder(shape=[1,8],dtype=tf.float32)
 # Build first layer
 W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,8], 'layer1')
 # Build second layer
-W2, b2, a2 = tf_utils.build_NN_layer(a1, [8,8], 'layer2')
+W2, b2, a2 = tf_utils.build_NN_layer(a1, [8,6], 'layer2')
 # Build shrinking third layer
-W3, b3, a3 = tf_utils.build_NN_layer(a2, [8,6], 'layer3')
-# Build shrinking fourth layer
-W4, b4, Qout = tf_utils.build_NN_layer(a3, [6,4], 'layer4')
+W3, b3, Qout = tf_utils.build_NN_layer(a2, [8,4], 'layer3')
 # Softmax prediction
 predict = tf.argmax(Qout,1)
 
@@ -47,10 +45,10 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-y = .99
-e = 0.1
+y = .999
+e = 0.2
 
-num_episodes = 2000
+num_episodes = 4000
 #create lists to contain total rewards and steps per episode
 rList = [] # total rewards
 
@@ -102,7 +100,7 @@ with tf.Session() as sess:
                 summary_writer.add_summary(summary_str, i)
                 summary_writer.flush()
                 #Reduce chance of random action as we train the model.
-                e = 1./((i/100) + 10)
+                e = 2./((i/200) + 10)
                 break
 
             # if i % 100 == 0 and i > 1500:
@@ -111,6 +109,7 @@ with tf.Session() as sess:
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
 
+    print (rList)
     if VISUALIZE:
         for i in range(200):
             s = env.reset()
@@ -126,5 +125,3 @@ with tf.Session() as sess:
 
     if save:
         save_path = saver.save(sess, save_name)
-
-print (rList)
