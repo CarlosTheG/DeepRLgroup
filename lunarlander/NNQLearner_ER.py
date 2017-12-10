@@ -111,6 +111,10 @@ with tf.Session() as sess:
             s = s1
             if d == True:
                 break
+            if i%100 == True:
+                env.render()
+                time.sleep(0.001)
+
         # Train on batch!
         for _ in range(BATCH_SIZE):
             # fetch sample from memory
