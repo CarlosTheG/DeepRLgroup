@@ -33,7 +33,7 @@ init = tf.initialize_all_variables()
 y = .99
 e = 0.1
 
-num_episodes = 2000
+num_episodes = 6000
 #create lists to contain total rewards and steps per episode
 rList = [] # total rewards
 
