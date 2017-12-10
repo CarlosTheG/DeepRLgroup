@@ -53,7 +53,7 @@ y = .99
 epsilons = np.linspace(1, 0.1, num_episodes*20)
 
 BATCH_SIZE = 2000
-memory_size = 50000
+memory_size = 25000
 experience_replay = ExperienceReplay(memory_size, 8)
 # populate initial memory bank with random actions
 s = env.reset()
@@ -96,15 +96,16 @@ with tf.Session() as sess:
             j += 1
             formatted_input = utils.format_state(s)
             # Chose action!
+            a = [0]
             if np.random.rand(1) < e:
-                a = env.action_space.sample()
+                a[0] = env.action_space.sample()
             else:
-                a = sess.run([predict], feed_dict={inputs:[formatted_input.flatten()]})[0]
+                a = sess.run([predict], feed_dict={inputs:[formatted_input.flatten()]})
             # take the action
-            s1,r,d,_ = env.step(a)
+            s1,r,d,_ = env.step(a[0])
             r = utils.get_reward(r, s1, a)
             # add to memory bank
-            experience_replay.add(s, a, s1, r, d)
+            experience_replay.add(s, a[0], s1, r, d)
             rAll += r
             s = s1
             if d == True:
@@ -115,14 +116,14 @@ with tf.Session() as sess:
             s, a, s1, r, d = experience_replay.sample()
             # fetch prediction for state s
             formatted_input = utils.format_state(s)
-            a, allQ = sess.run([predict,Qout], feed_dict={inputs:[formatted_input]})
+            allQ = sess.run([Qout], feed_dict={inputs:[formatted_input]})
             #Obtain the Q' values by feeding the new state through our network
             new_state = utils.format_state(s1)
             Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
             #Obtain maxQ' and set our target value for chosen action.
             maxQ1 = np.max(Q1)
             targetQ = allQ
-            targetQ[0,a[0]] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
+            targetQ[0,a] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
             #Train our network using target and predicted Q values
             _ = sess.run([updateModel],feed_dict={inputs:[formatted_input.flatten()],nextQ:targetQ})
 

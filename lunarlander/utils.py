@@ -6,7 +6,7 @@ def format_state(s, params=None):
 
 def get_reward(r,s,a):
     #speed = np.sqrt(s[2]**2 + s[3]**2)
-    if a == 0:
+    if a[0] == 0:
         return r - 0.5
     else:
         return r + 0.3
