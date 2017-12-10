@@ -4,6 +4,7 @@ import random
 import tensorflow as tf
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
+import time
 import utils
 import tf_utils
 import os
@@ -94,8 +95,7 @@ with tf.Session() as sess:
             targetQ = allQ
             targetQ[0,a[0]] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
             #Train our network using target and predicted Q values
-            _ = sess.run([updateModel],
-                feed_dict={inputs:[formatted_input.flatten()],nextQ:targetQ})
+            _ = sess.run([updateModel],feed_dict={inputs:[formatted_input.flatten()],nextQ:targetQ})
             rAll += r
             s = s1
             if d == True:
@@ -121,7 +121,6 @@ with tf.Session() as sess:
                     break
                 env.render()
                 time.sleep(0.1)
-
 
     if save:
         save_path = saver.save(sess, save_name)
