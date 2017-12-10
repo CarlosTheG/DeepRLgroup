@@ -73,6 +73,7 @@ with tf.Session() as sess:
         #Reduce chance of random action as we train the model.
         # e = 4./((i/200) + 10)
         rAll = 0 # total reward
+        lAll = 0
         j = 0
         #The Q-Network
         while j < 3000:
@@ -94,9 +95,9 @@ with tf.Session() as sess:
             targetQ = allQ
             targetQ[0,a[0]] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
             #Train our network using target and predicted Q values
-            _ = sess.run([updateModel],
-                feed_dict={inputs:[formatted_input.flatten()],nextQ:targetQ})
+            _,l = sess.run([updateModel,loss],feed_dict={inputs:[formatted_input.flatten()],nextQ:targetQ})
             rAll += r
+            lAll += l
             s = s1
             if d == True:
                 _, summary_str = sess.run([updateModel, summary_op],
@@ -107,6 +108,7 @@ with tf.Session() as sess:
 
         summary = tf.Summary()
         summary.value.add(tag='Reward',simple_value=rAll)
+        summary.value.add(tag='Total_Loss',simple_value=lAll)
         summary_writer.add_summary(summary, i)
         summary_writer.flush()
         rList.append(rAll)
