@@ -48,11 +48,11 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 1000
+num_episodes = 500
 y = .99
-epsilons = np.linspace(1, 0.1, num_episodes)
+epsilons = np.linspace(0.5, 0.1, num_episodes)
 
-BATCH_SIZE = 2000
+BATCH_SIZE = 1000
 memory_size = 50000
 experience_replay = ExperienceReplay(memory_size, 8)
 # populate initial memory bank with random actions
@@ -111,9 +111,8 @@ with tf.Session() as sess:
             s = s1
             if d == True:
                 break
-            if i%100 == True:
+            if i%50 == 0:
                 env.render()
-                time.sleep(0.001)
 
         # Train on batch!
         for _ in range(BATCH_SIZE):
