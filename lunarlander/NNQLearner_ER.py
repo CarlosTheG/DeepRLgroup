@@ -48,7 +48,7 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 2000
+num_episodes = 1000
 y = .99
 epsilons = np.linspace(1, 0.1, num_episodes*20)
 
@@ -136,7 +136,7 @@ with tf.Session() as sess:
 
     print (rList)
     if VISUALIZE:
-        for i in range(200):
+        for i in range(50):
             s = env.reset()
             while True:
                 formatted_input = utils.format_state(s)
