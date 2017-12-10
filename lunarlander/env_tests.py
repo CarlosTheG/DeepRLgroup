@@ -13,6 +13,8 @@ print (env.action_space)
 # 8 length vector
 print (env.observation_space)
 
+env.render()
+
 # while True:
 #     state,reward,d,_ = env.step(env.action_space.sample())
 #     print (str(state))

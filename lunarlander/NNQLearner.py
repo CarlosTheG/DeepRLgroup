@@ -3,6 +3,7 @@ import numpy as np
 import random
 import tensorflow as tf
 import matplotlib.pyplot as plt
+from matplotlib.animation import FuncAnimation
 import utils
 import tf_utils
 import os
@@ -23,9 +24,13 @@ tf.reset_default_graph()
 #These lines establish the feed-forward part of the network used to choose actions
 inputs = tf.placeholder(shape=[1,8],dtype=tf.float32)
 # Build first layer
-W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,6], 'layer1')
+W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,8], 'layer1')
 # Build second layer
-W2, b2, Qout = tf_utils.build_NN_layer(a1, [6,4], 'layer2')
+W2, b2, a2 = tf_utils.build_NN_layer(a1, [8,8], 'layer2')
+# Build shrinking third layer
+W3, b3, a3 = tf_utils.build_NN_layer(a2, [8,6], 'layer3')
+# Build shrinking fourth layer
+W4, b4, Qout = tf_utils.build_NN_layer(a3, [6,4], 'layer4')
 # Softmax prediction
 predict = tf.argmax(Qout,1)
 
@@ -98,11 +103,23 @@ with tf.Session() as sess:
                 e = 1./((i/100) + 10)
                 break
 
-            if i % 100 == 0 and i > 1500:
-                env.render()
+            # if i % 100 == 0 and i > 1500:
+            #     env.render()
 
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
+
+    for i in range(1000):
+        s = env.reset()
+        while True:
+            formatted_input = utils.format_state(s)
+            a,allQ = sess.run([predict,Qout],
+                feed_dict={inputs:[formatted_input.flatten()]})
+            s,r,d,_ = env.step(a[0]) #observation, reward, done, info
+            if d == True:
+                break
+            env.render()
+
 
     if save:
         save_path = saver.save(sess, save_name)
