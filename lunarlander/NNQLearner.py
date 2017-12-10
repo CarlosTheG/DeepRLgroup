@@ -17,6 +17,8 @@ save = True
 restore_name = 'save'
 restore = False
 
+VISUALIZE = False
+
 
 env = gym.make('LunarLander-v2')
 tf.reset_default_graph()
@@ -109,16 +111,17 @@ with tf.Session() as sess:
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
 
-    for i in range(1000):
-        s = env.reset()
-        while True:
-            formatted_input = utils.format_state(s)
-            a,allQ = sess.run([predict,Qout],
-                feed_dict={inputs:[formatted_input.flatten()]})
-            s,r,d,_ = env.step(a[0]) #observation, reward, done, info
-            if d == True:
-                break
-            env.render()
+    if VISUALIZE:
+        for i in range(200):
+            s = env.reset()
+            while True:
+                formatted_input = utils.format_state(s)
+                a,allQ = sess.run([predict,Qout],
+                    feed_dict={inputs:[formatted_input.flatten()]})
+                s,r,d,_ = env.step(a[0]) #observation, reward, done, info
+                if d == True:
+                    break
+                env.render()
 
 
     if save:
