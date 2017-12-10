@@ -30,7 +30,7 @@ W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,8], 'layer1')
 # Build second layer
 W2, b2, a2 = tf_utils.build_NN_layer(a1, [8,6], 'layer2')
 # Build shrinking third layer
-W3, b3, Qout = tf_utils.build_NN_layer(a2, [8,4], 'layer3')
+W3, b3, Qout = tf_utils.build_NN_layer(a2, [6,4], 'layer3')
 # Softmax prediction
 predict = tf.argmax(Qout,1)
 
