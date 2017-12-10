@@ -29,18 +29,18 @@ tf.reset_default_graph()
 #These lines establish the feed-forward part of the network used to choose actions
 inputs = tf.placeholder(shape=[1,8],dtype=tf.float32)
 # Build first layer
-W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,8], 'layer1')
+W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,40], 'layer1')
 # Build second layer
-W2, b2, a2 = tf_utils.build_NN_layer(a1, [8,8], 'layer2')
+W2, b2, a2 = tf_utils.build_NN_layer(a1, [40,30], 'layer2')
 # Build shrinking third layer
-W3, b3, Qout = tf_utils.build_NN_layer(a2, [8,4], 'layer3')
+W3, b3, Qout = tf_utils.build_NN_layer(a2, [30,4], 'layer3')
 # Softmax prediction
 predict = tf.argmax(Qout,1)
 
 #Below we obtain the loss by taking the sum of squares difference between the target and prediction Q values.
 nextQ = tf.placeholder(shape=[1,4],dtype=tf.float32)
 loss = tf.reduce_sum(tf.square(nextQ - Qout))
-trainer = tf.train.AdamOptimizer(learning_rate=0.01)
+trainer = tf.train.AdamOptimizer(learning_rate=0.001)
 updateModel = trainer.minimize(loss)
 
 tf.summary.scalar('Loss',loss)
@@ -50,10 +50,10 @@ init = tf.initialize_all_variables()
 # Set learning parameters
 num_episodes = 500
 y = .99
-epsilons = np.linspace(0.5, 0.1, num_episodes)
+epsilons = np.linspace(0.3, 0.1, num_episodes)
 
-BATCH_SIZE = 1000
-memory_size = 50000
+BATCH_SIZE = 500
+memory_size = 10000
 experience_replay = ExperienceReplay(memory_size, 8)
 # populate initial memory bank with random actions
 s = env.reset()
@@ -91,6 +91,7 @@ with tf.Session() as sess:
         # e = 4./((i/200) + 10)
         rAll = 0 # total reward
         j = 0
+        r_prev = 0
         #The Q-Network
         while j < 3000:
             j += 1
@@ -106,12 +107,13 @@ with tf.Session() as sess:
             s1,r,d,_ = env.step(a[0])
             r = utils.get_reward(r, s1, a)
             # add to memory bank
-            experience_replay.add(s, a[0], s1, r, d)
+            experience_replay.add(s, a[0], s1, r-r_prev, d)
             rAll += r
+            r_prev = r
             s = s1
             if d == True:
                 break
-            if i%50 == 0:
+            if True:
                 env.render()
 
         # Train on batch!
