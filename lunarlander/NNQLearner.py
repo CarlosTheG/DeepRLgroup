@@ -48,7 +48,7 @@ init = tf.initialize_all_variables()
 y = .999
 e = 0.2
 
-num_episodes = 4000
+num_episodes = 2000
 #create lists to contain total rewards and steps per episode
 rList = [] # total rewards
 
@@ -75,6 +75,7 @@ with tf.Session() as sess:
             j += 1
             #Choose an action by greedily (with e chance of random action) from the Q-network
             formatted_input = utils.format_state(s)
+
             a,allQ = sess.run([predict,Qout],
                 feed_dict={inputs:[formatted_input.flatten()]})
             if np.random.rand(1) < e:
