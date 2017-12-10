@@ -1,3 +1,4 @@
+''' EXPERIENCE REPLAY WOW '''
 import gym
 import numpy as np
 import random
@@ -6,6 +7,7 @@ import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import time
 import utils
+from replay_mem import *
 import tf_utils
 import os
 # matplotlib inline
@@ -46,9 +48,23 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 2000
+num_episodes = 1000
 y = .99
 epsilons = np.linspace(1, 0.1, num_episodes*20)
+
+BATCH_SIZE = 2000
+memory_size = 50000
+experience_replay = ExperienceReplay(memory_size, 8)
+# populate initial memory bank with random actions
+s = env.reset()
+for i in range(memory_size):
+    a = env.action_space.sample()
+    s1,r,d,_ = env.step(a)
+    experience_replay.add(s, a, s1, r, d)
+    s = s1
+    if d == True:
+        s = env.reset()
+
 
 
 #create lists to contain total rewards and steps per episode
@@ -74,50 +90,55 @@ with tf.Session() as sess:
         #Reduce chance of random action as we train the model.
         # e = 4./((i/200) + 10)
         rAll = 0 # total reward
-        lAll = 0
         j = 0
         #The Q-Network
         while j < 3000:
             j += 1
-            #Choose an action by greedily (with e chance of random action) from the Q-network
             formatted_input = utils.format_state(s)
-            a,allQ = sess.run([predict,Qout],
-                feed_dict={inputs:[formatted_input.flatten()]})
+            # Chose action!
+            a = [0]
             if np.random.rand(1) < e:
                 a[0] = env.action_space.sample()
-            #Get new state and reward from environment
-            s1,r,d,_ = env.step(a[0]) #observation, reward, done, info
+            else:
+                a = sess.run(predict, feed_dict={inputs:[formatted_input.flatten()]})
+
+            # take the action
+            s1,r,d,_ = env.step(a[0])
             r = utils.get_reward(r, s1, a)
+            # add to memory bank
+            experience_replay.add(s, a[0], s1, r, d)
+            rAll += r
+            s = s1
+            if d == True:
+                break
+        # Train on batch!
+        for _ in range(BATCH_SIZE):
+            # fetch sample from memory
+            s, a, s1, r, d = experience_replay.sample()
+            # fetch prediction for state s
+            formatted_input = utils.format_state(s)
+            allQ = sess.run(Qout, feed_dict={inputs:[formatted_input.flatten()]})
             #Obtain the Q' values by feeding the new state through our network
             new_state = utils.format_state(s1)
             Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
             #Obtain maxQ' and set our target value for chosen action.
             maxQ1 = np.max(Q1)
             targetQ = allQ
-            targetQ[0,a[0]] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
+            targetQ[0,a] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
             #Train our network using target and predicted Q values
-            _,l = sess.run([updateModel,loss],feed_dict={inputs:[formatted_input.flatten()],nextQ:targetQ})
-            rAll += r
-            lAll += l
-            s = s1
-            if d == True:
-                _, summary_str = sess.run([updateModel, summary_op],
-                    feed_dict={inputs: [formatted_input.flatten()], nextQ: targetQ})
-                summary_writer.add_summary(summary_str, i)
-                summary_writer.flush()
-                break
+            _ = sess.run([updateModel],feed_dict={inputs:[formatted_input],nextQ:targetQ})
 
-        summary = tf.Summary()
-        summary.value.add(tag='Reward',simple_value=rAll)
-        summary.value.add(tag='Total_Loss',simple_value=lAll)
-        summary_writer.add_summary(summary, i)
+        _, summary_str = sess.run([updateModel, summary_op],
+            feed_dict={inputs: [formatted_input.flatten()], nextQ: targetQ})
+        summary_writer.add_summary(summary_str, i)
         summary_writer.flush()
+
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
 
     print (rList)
     if VISUALIZE:
-        for i in range(200):
+        for i in range(50):
             s = env.reset()
             while True:
                 formatted_input = utils.format_state(s)
