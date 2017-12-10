@@ -105,6 +105,10 @@ with tf.Session() as sess:
                 summary_writer.flush()
                 break
 
+        summary = tf.Summary()
+        summary.value.add(tag='Reward',simple_value=rAll)
+        summary_writer.add_summary(summary, i)
+        summary_writer.flush()
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
 
