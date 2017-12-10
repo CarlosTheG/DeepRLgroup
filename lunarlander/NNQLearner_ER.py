@@ -50,7 +50,7 @@ init = tf.initialize_all_variables()
 # Set learning parameters
 num_episodes = 1000
 y = .99
-epsilons = np.linspace(1, 0.1, num_episodes*20)
+epsilons = np.linspace(1, 0.1, num_episodes)
 
 BATCH_SIZE = 2000
 memory_size = 50000
