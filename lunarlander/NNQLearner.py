@@ -45,10 +45,11 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-y = .999
-e = 0.2
-
 num_episodes = 2000
+y = .999
+epsilons = np.linspace(0.8, 0.1, num_episodes)
+
+
 #create lists to contain total rewards and steps per episode
 rList = [] # total rewards
 
@@ -68,6 +69,7 @@ with tf.Session() as sess:
     for i in range(num_episodes):
         #Reset environment and get first new observation
         s = env.reset()
+        e = epsilons[i]
         rAll = 0 # total reward
         j = 0
         #The Q-Network
@@ -100,12 +102,7 @@ with tf.Session() as sess:
                     feed_dict={inputs: [formatted_input.flatten()], nextQ: targetQ})
                 summary_writer.add_summary(summary_str, i)
                 summary_writer.flush()
-                #Reduce chance of random action as we train the model.
-                e = 2./((i/200) + 10)
                 break
-
-            # if i % 100 == 0 and i > 1500:
-            #     env.render()
 
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
