@@ -1,3 +1,8 @@
+'''
+Almost direct copy of https://github.com/FitMachineLearning/FitML/.
+This file is used as a template for guidance on the rest of the keras/Tf
+python files.
+'''
 import numpy as np
 import keras
 import gym
