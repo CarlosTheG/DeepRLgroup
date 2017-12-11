@@ -48,8 +48,8 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 200
-y = .99
+num_episodes = 500
+y = .8
 epsilons = np.linspace(0.4, 0.2, num_episodes)
 
 BATCH_SIZE = 250
@@ -114,8 +114,6 @@ with tf.Session() as sess:
             s = s1
             if d == True:
                 break
-            # if True:
-            #     env.render()
 
         # Train on batch!
         for _ in range(BATCH_SIZE):

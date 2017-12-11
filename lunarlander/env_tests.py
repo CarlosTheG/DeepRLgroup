@@ -15,13 +15,13 @@ print (env.observation_space)
 
 env.render()
 
-# while True:
-#     state,reward,d,_ = env.step(env.action_space.sample())
-#     print (str(state))
-#     if d == True:
-#         break
-#     env.render()
-#     time.sleep(0.1)
+while True:
+    state,reward,d,_ = env.step(env.action_space.sample())
+    print (str(state))
+    if d == True:
+        break
+    env.render()
+    time.sleep(0.1)
 
 
 '''
