@@ -147,9 +147,7 @@ if VISUALIZE:
     for i in range(50):
         s = env.reset()
         while True:
-            formatted_input = utils.format_state(s)
-            a,allQ = sess.run([predict,Qout],
-                feed_dict={inputs:[formatted_input.flatten()]})
+            a = model.predict([s])
             s,r,d,_ = env.step(a[0]) #observation, reward, done, info
             reward += r
             if d == True:

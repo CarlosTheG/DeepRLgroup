@@ -8,36 +8,35 @@ class MemoryReplay:
         self.insert_location = 0
         self.count = 0
 
-        self.target = np.empty([self.memory_size, self.action_dim], dtype=np.float32)
-        self.state = np.empty([self.memory_size, self.observation_dim], dtype=np.float32)
+        self.state = np.empty([self.memory_size, self.observation_dim+self.action_dim],
+            dtype=np.float32)
+        self.reward = np.empty([self.memory_size], dtype=np.float32)
 
 
-    def add(self, state, target):
+    def add(self, state, reward):
         i = self.insert_location
         self.count += 1
 
-        self.target[i,:] = target
         self.state[i,:] = state
+        self.reward[i] = reward
         # update insert location to next location in replay memory
         self.insert_location = (self.insert_location + 1) % self.memory_size
 
-    # def sample(self):
-    #     limit = min(self.memory_size, self.count)
-    #     idx = np.random.randint(limit)
-    #     return (self.state[idx,:], self.action[idx], self.reward[idx])
 
     def get(self, idx):
-        return (self.state[idx,:], self.target[idx,:])
+        return (self.state[idx,:], self.reward[idx])
 
     def get_training_data(self, size=None):
         limit = min(self.memory_size, self.count)
         if size == None:
-            size = limit*2
+            size = limit
         idxs = np.random.randint(limit, size=size)
-        X = np.empty([self.memory_size, self.observation_dim], dtype=np.float32)
-        y = np.empty([self.memory_size, self.action_dim], dtype=np.float32)
-        for i in idxs:
-            s, target = self.get(i)
+        X = np.empty([size, self.observation_dim+self.action_dim], dtype=np.float32)
+        r = np.empty([size], dtype=np.float32)
+        i = 0
+        for j in idxs:
+            s, reward = self.get(j)
             X[i, :] = s
-            y[i, :] = target
-        return np.array(X), np.array(y)
+            r[i] = reward
+            i += 1
+        return np.array(X), np.array(r)

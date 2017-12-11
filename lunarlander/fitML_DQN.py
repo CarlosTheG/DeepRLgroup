@@ -14,17 +14,17 @@ num_env_variables = 8
 num_env_actions = 4
 num_initial_observation = 0
 learning_rate = 0.001
-weigths_filename = "LL-QL-v2-weights.h5"
+weigths_filename = "LL-QL-v2-weights2.h5"
 
 b_discount = 0.98
 max_memory_len = 60000
 starting_explore_prob = 0.05
 training_epochs = 2
-load_previous_weights = True
+load_previous_weights = False
 observe_and_train = True
-save_weights = True
+save_weights = False
 visualize = True
-num_games_to_play = 50
+num_games_to_play = 100
 
 
 #One hot encoding array
@@ -48,6 +48,7 @@ dataY = np.random.random((5,1))
 model = Sequential()
 #model.add(Dense(num_env_variables+num_env_actions, activation='tanh', input_dim=dataX.shape[1]))
 model.add(Dense(512, activation='relu', input_dim=dataX.shape[1]))
+model.add(Dense(250, activation='relu', input_dim=512))
 model.add(Dense(dataY.shape[1]))
 
 opt = optimizers.adam(lr=learning_rate)
