@@ -2,7 +2,11 @@
 import gym
 import numpy as np
 import random
-import tensorflow as tf
+from keras.callbacks import TensorBoard
+from keras.models import Sequential
+from keras.layers import Dense, Dropout
+from keras.layers import Embedding
+from keras import optimizers
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
 import time
