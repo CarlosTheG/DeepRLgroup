@@ -29,11 +29,11 @@ tf.reset_default_graph()
 #These lines establish the feed-forward part of the network used to choose actions
 inputs = tf.placeholder(shape=[1,8],dtype=tf.float32)
 # Build first layer
-W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,100], 'layer1')
+W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,500], 'layer1')
 # Build second layer
-W2, b2, a2 = tf_utils.build_NN_layer(a1, [100,75], 'layer2')
+W2, b2, a2 = tf_utils.build_NN_layer(a1, [500,250], 'layer2')
 # Build shrinking third layer
-W3, b3, Qout = tf_utils.build_NN_layer(a2, [75,4], 'layer3')
+W3, b3, Qout = tf_utils.build_NN_layer(a2, [250,4], 'layer3')
 # Softmax prediction
 predict = tf.argmax(Qout,1)
 
@@ -48,12 +48,13 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 100
-y = .8
-epsilons = np.linspace(0.4, 0.2, num_episodes)
+num_episodes = 5000
+y = .99
+epsilon_s = 0.1
 
-BATCH_SIZE = 250
-memory_size = 50000
+RETRAIN_GAMES = 10
+BATCH_SIZE = 30000
+memory_size = 60000
 experience_replay = ExperienceReplay(memory_size, 8)
 # populate initial memory bank with random actions
 s = env.reset()
@@ -86,9 +87,8 @@ with tf.Session() as sess:
     for i in range(num_episodes):
         #Reset environment and get first new observation
         s = env.reset()
-        e = epsilons[i]
         #Reduce chance of random action as we train the model.
-        # e = 4./((i/200) + 10)
+        e = epsilon_s/((i+1)/float(num_episodes))
         rAll = 0 # total reward
         lAll = 0
         j = 0
@@ -106,37 +106,34 @@ with tf.Session() as sess:
 
             # take the action
             s1,r,d,_ = env.step(a[0])
-            rAll += r
             r = utils.get_reward(r, s1, a)
             # add to memory bank
             experience_replay.add(s, a[0], s1, r, d)
-            r_prev = r
+            rAll += r
             s = s1
             if d == True:
                 break
+            env.render()
 
-        # Train on batch!
-        for _ in range(BATCH_SIZE):
-            # fetch sample from memory
-            s, a, s1, r, d = experience_replay.sample()
-            # fetch prediction for state s
-            formatted_input = utils.format_state(s)
-            allQ = sess.run(Qout, feed_dict={inputs:[formatted_input.flatten()]})
-            #Obtain the Q' values by feeding the new state through our network
-            new_state = utils.format_state(s1)
-            Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
-            #Obtain maxQ' and set our target value for chosen action.
-            maxQ1 = np.max(Q1)
-            targetQ = allQ
-            targetQ[0,a] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
-            #Train our network using target and predicted Q values
-            _, l = sess.run([updateModel,loss],feed_dict={inputs:[formatted_input],nextQ:targetQ})
-            lAll += l
+        if i % RETRAIN_GAMES:
+            # Train on data!
+            for _ in range(BATCH_SIZE):
+                # fetch sample from memory
+                s, a, s1, r, d = experience_replay.sample()
+                # fetch prediction for state s
+                formatted_input = utils.format_state(s)
+                allQ = sess.run(Qout, feed_dict={inputs:[formatted_input.flatten()]})
+                #Obtain the Q' values by feeding the new state through our network
+                new_state = utils.format_state(s1)
+                Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
+                #Obtain maxQ' and set our target value for chosen action.
+                maxQ1 = np.max(Q1)
+                targetQ = allQ
+                targetQ[0,a] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
+                #Train our network using target and predicted Q values
+                _, l = sess.run([updateModel,loss],feed_dict={inputs:[formatted_input],nextQ:targetQ})
+                lAll += l
 
-        _, summary_str = sess.run([updateModel, summary_op],
-            feed_dict={inputs: [formatted_input.flatten()], nextQ: targetQ})
-        summary_writer.add_summary(summary_str, i)
-        summary_writer.flush()
         summary = tf.Summary()
         summary.value.add(tag='Reward',simple_value=rAll)
         summary.value.add(tag='Total_Loss',simple_value=lAll)
