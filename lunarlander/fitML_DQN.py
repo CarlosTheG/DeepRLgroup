@@ -14,16 +14,17 @@ num_env_variables = 8
 num_env_actions = 4
 num_initial_observation = 0
 learning_rate = 0.001
-#weigths_filename = "LL-QL-v2-weights.h5"
+weigths_filename = "LL-QL-v2-weights.h5"
 
 b_discount = 0.98
 max_memory_len = 60000
 starting_explore_prob = 0.05
 training_epochs = 2
-#load_previous_weights = True
+load_previous_weights = True
 observe_and_train = True
-save_weights = False
-num_games_to_play = 500
+save_weights = True
+visualize = True
+num_games_to_play = 50
 
 
 #One hot encoding array
@@ -54,15 +55,15 @@ opt = optimizers.adam(lr=learning_rate)
 model.compile(loss='mse', optimizer=opt, metrics=['accuracy'])
 
 #load previous model weights if they exist
-# if load_previous_weights:
-#     dir_path = os.path.realpath(".")
-#     fn = dir_path + "/"+weigths_filename
-#     print("filepath ", fn)
-#     if  os.path.isfile(fn):
-#         print("loading weights")
-#         model.load_weights(weigths_filename)
-#     else:
-#         print("File ",weigths_filename," does not exis. Retraining... ")
+if load_previous_weights:
+    dir_path = os.path.realpath(".")
+    fn = dir_path + "/"+weigths_filename
+    print("filepath ", fn)
+    if  os.path.isfile(fn):
+        print("loading weights")
+        model.load_weights(weigths_filename)
+    else:
+        print("File ",weigths_filename," does not exis. Retraining... ")
 
 #Initialize training data array
 total_steps = 0
@@ -140,8 +141,8 @@ if observe_and_train:
                     a = np.argmax(utility_possible_actions)
 
 
-
-            env.render()
+            if visualize:
+                env.render()
             qs_a = np.concatenate((qs,actions_1_hot[a]), axis=0)
 
             #print("action",a," qs_a",qs_a)
@@ -159,8 +160,7 @@ if observe_and_train:
             gameX = np.vstack((gameX,qs_a))
             gameY = np.vstack((gameY,np.array([r])))
 
-
-            if done :
+            if done:
                 #GAME ENDED
                 #Calculate Q values from end to start of game (From last step to first)
                 for i in range(0,gameY.shape[0]):
@@ -206,7 +206,6 @@ if observe_and_train:
                     print("Game ", game," WON *** " )
                 #Game ended - Break
                 break
-
 
 
 

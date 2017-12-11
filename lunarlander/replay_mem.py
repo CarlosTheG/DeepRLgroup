@@ -4,6 +4,7 @@ class ExperienceReplay:
     def __init__(self, memory_size, observation_dim):
         self.memory_size = memory_size
         self.insert_location = 0
+        self.count = 0
 
         self.action = np.empty(self.memory_size, dtype=np.uint8)
         self.reward = np.empty(self.memory_size, dtype=np.float32)
@@ -14,6 +15,7 @@ class ExperienceReplay:
 
     def add(self, state, action, next_s, reward, done):
         i = self.insert_location
+        self.count += 1
 
         self.action[i] = action
         self.reward[i] = reward
