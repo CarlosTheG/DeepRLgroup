@@ -10,7 +10,7 @@ def get_reward(r,s,a):
         r = -200
     elif r > 80:
         # was a soft landing!
-        r = 200
+        r = 1000
     # add reward for speed
     speed = min(2,np.sqrt(s[2]**2 + s[3]**2))
     r += (2*(2 - speed))**5

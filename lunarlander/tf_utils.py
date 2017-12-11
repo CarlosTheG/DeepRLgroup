@@ -1,6 +1,6 @@
 import tensorflow as tf
 
-def build_NN_layer(input_layer, shape, name, actFun=tf.nn.tanh):
+def build_NN_layer(input_layer, shape, name, actFun=tf.nn.relu):
     W = weight_variable(shape, name + '_W')
     b = bias_variable([shape[1]], name + '_b')
     a = actFun(tf.matmul(input_layer, W) + b)

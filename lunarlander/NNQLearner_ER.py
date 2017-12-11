@@ -29,11 +29,11 @@ tf.reset_default_graph()
 #These lines establish the feed-forward part of the network used to choose actions
 inputs = tf.placeholder(shape=[1,8],dtype=tf.float32)
 # Build first layer
-W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,40], 'layer1')
+W1, b1, a1 = tf_utils.build_NN_layer(inputs, [8,100], 'layer1')
 # Build second layer
-W2, b2, a2 = tf_utils.build_NN_layer(a1, [40,30], 'layer2')
+W2, b2, a2 = tf_utils.build_NN_layer(a1, [100,75], 'layer2')
 # Build shrinking third layer
-W3, b3, Qout = tf_utils.build_NN_layer(a2, [30,4], 'layer3')
+W3, b3, Qout = tf_utils.build_NN_layer(a2, [75,4], 'layer3')
 # Softmax prediction
 predict = tf.argmax(Qout,1)
 
@@ -48,7 +48,7 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 500
+num_episodes = 100
 y = .8
 epsilons = np.linspace(0.4, 0.2, num_episodes)
 
@@ -106,10 +106,10 @@ with tf.Session() as sess:
 
             # take the action
             s1,r,d,_ = env.step(a[0])
+            rAll += r
             r = utils.get_reward(r, s1, a)
             # add to memory bank
             experience_replay.add(s, a[0], s1, r, d)
-            rAll += r
             r_prev = r
             s = s1
             if d == True:
@@ -148,6 +148,7 @@ with tf.Session() as sess:
 
     print (rList)
     if VISUALIZE:
+        reward = 0
         for i in range(50):
             s = env.reset()
             while True:
@@ -155,10 +156,12 @@ with tf.Session() as sess:
                 a,allQ = sess.run([predict,Qout],
                     feed_dict={inputs:[formatted_input.flatten()]})
                 s,r,d,_ = env.step(a[0]) #observation, reward, done, info
+                reward += r
                 if d == True:
                     break
                 env.render()
                 time.sleep(0.001)
+        print(reward/50.0)
 
     if save:
         save_path = saver.save(sess, save_name)
