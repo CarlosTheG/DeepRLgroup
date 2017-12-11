@@ -48,9 +48,9 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 2000
-y = .8
-epsilons = np.linspace(0.3, 0.1, num_episodes)
+num_episodes = 200
+y = .99
+epsilons = np.linspace(0.4, 0.2, num_episodes)
 
 BATCH_SIZE = 250
 memory_size = 50000
@@ -90,6 +90,7 @@ with tf.Session() as sess:
         #Reduce chance of random action as we train the model.
         # e = 4./((i/200) + 10)
         rAll = 0 # total reward
+        lAll = 0
         j = 0
         r_prev = 0
         #The Q-Network
@@ -131,7 +132,8 @@ with tf.Session() as sess:
             targetQ = allQ
             targetQ[0,a] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
             #Train our network using target and predicted Q values
-            _ = sess.run([updateModel],feed_dict={inputs:[formatted_input],nextQ:targetQ})
+            _, l = sess.run([updateModel,loss],feed_dict={inputs:[formatted_input],nextQ:targetQ})
+            lAll += l
 
         _, summary_str = sess.run([updateModel, summary_op],
             feed_dict={inputs: [formatted_input.flatten()], nextQ: targetQ})
@@ -148,7 +150,7 @@ with tf.Session() as sess:
 
     print (rList)
     if VISUALIZE:
-        for i in range(200):
+        for i in range(50):
             s = env.reset()
             while True:
                 formatted_input = utils.format_state(s)
