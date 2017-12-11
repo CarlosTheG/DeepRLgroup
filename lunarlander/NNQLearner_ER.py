@@ -137,6 +137,11 @@ with tf.Session() as sess:
             feed_dict={inputs: [formatted_input.flatten()], nextQ: targetQ})
         summary_writer.add_summary(summary_str, i)
         summary_writer.flush()
+        summary = tf.Summary()
+        summary.value.add(tag='Reward',simple_value=rAll)
+        summary.value.add(tag='Total_Loss',simple_value=lAll)
+        summary_writer.add_summary(summary, i)
+        summary_writer.flush()
 
         rList.append(rAll)
         print ("Reward for round", i, "is :", rAll)
