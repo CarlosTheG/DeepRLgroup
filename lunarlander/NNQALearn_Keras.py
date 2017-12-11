@@ -2,6 +2,7 @@
 import gym
 import numpy as np
 import random
+import keras
 from keras.callbacks import TensorBoard
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
@@ -117,7 +118,7 @@ for i in range(num_episodes):
             break
         if i % 100 == 0:
             env.render()
-
+    rList.append(rAll)
     # manually compute bellman's for rewards
     game_len = len(game_data)
     zero_len = game_len-1
@@ -142,6 +143,10 @@ for i in range(num_episodes):
 
 print (rList)
 print (history.losses)
+
+print("Saving weights")
+model.save_weights("weights-QSAL.h5")
+
 if VISUALIZE:
     reward = 0
     for i in range(50):
