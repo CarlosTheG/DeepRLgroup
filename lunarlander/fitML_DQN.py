@@ -23,7 +23,7 @@ training_epochs = 2
 #load_previous_weights = True
 observe_and_train = True
 save_weights = False
-num_games_to_play = 50
+num_games_to_play = 500
 
 
 #One hot encoding array
