@@ -52,8 +52,7 @@ num_episodes = 5000
 y = .99
 epsilon_s = 0.1
 
-RETRAIN_GAMES = 10
-BATCH_SIZE = 30000
+BATCH_SIZE = 500
 memory_size = 60000
 experience_replay = ExperienceReplay(memory_size, 8)
 # populate initial memory bank with random actions
@@ -115,24 +114,23 @@ with tf.Session() as sess:
                 break
             env.render()
 
-        if i % RETRAIN_GAMES:
-            # Train on data!
-            for _ in range(BATCH_SIZE):
-                # fetch sample from memory
-                s, a, s1, r, d = experience_replay.sample()
-                # fetch prediction for state s
-                formatted_input = utils.format_state(s)
-                allQ = sess.run(Qout, feed_dict={inputs:[formatted_input.flatten()]})
-                #Obtain the Q' values by feeding the new state through our network
-                new_state = utils.format_state(s1)
-                Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
-                #Obtain maxQ' and set our target value for chosen action.
-                maxQ1 = np.max(Q1)
-                targetQ = allQ
-                targetQ[0,a] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
-                #Train our network using target and predicted Q values
-                _, l = sess.run([updateModel,loss],feed_dict={inputs:[formatted_input],nextQ:targetQ})
-                lAll += l
+        # Train on data!
+        for _ in range(BATCH_SIZE):
+            # fetch sample from memory
+            s, a, s1, r, d = experience_replay.sample()
+            # fetch prediction for state s
+            formatted_input = utils.format_state(s)
+            allQ = sess.run(Qout, feed_dict={inputs:[formatted_input.flatten()]})
+            #Obtain the Q' values by feeding the new state through our network
+            new_state = utils.format_state(s1)
+            Q1 = sess.run(Qout,feed_dict={inputs:[new_state.flatten()]})
+            #Obtain maxQ' and set our target value for chosen action.
+            maxQ1 = np.max(Q1)
+            targetQ = allQ
+            targetQ[0,a] = r + y*maxQ1 # add the following to location of last action in targetQ: reward + discount rate*maxreward
+            #Train our network using target and predicted Q values
+            _, l = sess.run([updateModel,loss],feed_dict={inputs:[formatted_input],nextQ:targetQ})
+            lAll += l
 
         summary = tf.Summary()
         summary.value.add(tag='Reward',simple_value=rAll)
