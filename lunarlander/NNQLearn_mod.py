@@ -2,6 +2,7 @@
 import gym
 import numpy as np
 import random
+import keras
 from keras.callbacks import TensorBoard
 from keras.models import Sequential
 from keras.layers import Dense, Dropout
@@ -49,9 +50,9 @@ history = LossHistory()
 
 model = Sequential()
 #model.add(Dense(num_env_variables+num_env_actions, activation='tanh', input_dim=dataX.shape[1]))
-model.add(Dense(512, activation='relu', input_dim=12))
+model.add(Dense(512, activation='relu', input_dim=8))
 model.add(Dense(250, activation='relu', input_dim=512))
-model.add(Dense(1))
+model.add(Dense(4))
 
 opt = optimizers.adam(lr=0.001)
 model.compile(loss='mse', optimizer=opt, metrics=['accuracy'])
@@ -80,23 +81,23 @@ for i in range(num_episodes):
         j += 1
         formatted_input = utils.format_state(s)
         # Chose action!
-        a = [0]
         if np.random.rand(1) < e:
-            a[0] = env.action_space.sample()
+            a = env.action_space.sample()
         else:
-            a = model.predict([formatted_input])
+            a = model.predict(np.array([formatted_input]))[0]
+            a = np.argmax(a)
 
         # take the action
-        s,r,d,_ = env.step(a[0])
+        s,r,d,_ = env.step(a)
         # add data
-        data = [formatted_input, a[0], r]
+        data = [formatted_input, a, r]
         game_data.append(data)
 
         rAll += r
         if d == True:
             break
-        # if i % 100 == 0:
-        #     env.render()
+        if i % 50 == 0:
+            env.render()
 
     # manually compute bellman's for rewards
     game_len = len(game_data)
@@ -108,6 +109,8 @@ for i in range(num_episodes):
             # recurse with belman's equation within the game
             future_reward = y*game_data[zero_len-j+1][2]
             game_data[zero_len-j][2] = game_data[zero_len-j][2] + future_reward
+    print("Game #",i, " steps = ", j ,"last reward", r," finished with headscore ", game_data[0][2])
+
 
     # add data to the experience_replay bank
     for s,a,r in game_data:
@@ -134,8 +137,9 @@ if VISUALIZE:
     for i in range(50):
         s = env.reset()
         while True:
-            a = model.predict([s])
-            s,r,d,_ = env.step(a[0]) #observation, reward, done, info
+            a = model.predict(np.array([s]))[0]
+            action = np.argmax(a)
+            s,r,d,_ = env.step(action) #observation, reward, done, info
             reward += r
             if d == True:
                 break
