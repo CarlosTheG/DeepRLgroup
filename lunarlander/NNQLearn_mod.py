@@ -116,7 +116,7 @@ for i in range(num_episodes):
         targets = model.predict(X)
         r[np.where(np.isnan(r))] = 0
         targets[:, a] = r
-                model.fit(X,r.reshape([-1,1]), batch_size=32,epochs=2,verbose=2,
+        model.fit(X,targets, batch_size=32,epochs=2,verbose=2,
                     callbacks=[tensorboard, history])
 
     rList.append(rAll)
@@ -130,9 +130,7 @@ if VISUALIZE:
     for i in range(50):
         s = env.reset()
         while True:
-            formatted_input = utils.format_state(s)
-            a,allQ = sess.run([predict,Qout],
-                feed_dict={inputs:[formatted_input.flatten()]})
+            a = model.predict([s])
             s,r,d,_ = env.step(a[0]) #observation, reward, done, info
             reward += r
             if d == True:
