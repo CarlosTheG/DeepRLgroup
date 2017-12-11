@@ -48,7 +48,7 @@ summary_op = tf.summary.merge_all()
 
 init = tf.initialize_all_variables()
 # Set learning parameters
-num_episodes = 500
+num_episodes = 2000
 y = .8
 epsilons = np.linspace(0.3, 0.1, num_episodes)
 
@@ -113,8 +113,8 @@ with tf.Session() as sess:
             s = s1
             if d == True:
                 break
-            if True:
-                env.render()
+            # if True:
+            #     env.render()
 
         # Train on batch!
         for _ in range(BATCH_SIZE):
@@ -143,7 +143,7 @@ with tf.Session() as sess:
 
     print (rList)
     if VISUALIZE:
-        for i in range(50):
+        for i in range(200):
             s = env.reset()
             while True:
                 formatted_input = utils.format_state(s)
