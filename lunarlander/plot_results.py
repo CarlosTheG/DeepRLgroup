@@ -29,16 +29,16 @@ with open(file2) as f:
 rewards2 = parse_arr_line(content2[0])
 loss2 = parse_arr_line(content2[1])[:len(loss1)]
 
-plt.plot(range(len(rewards1)), rewards1, label="DeepQ")
-plt.plot(range(len(rewards2)), rewards2, label="DeepPolicy")
-plt.legend()
-plt.xlabel('Episode')
-plt.ylabel('Reward')
-plt.savefig("q_vs_policy_reward.png")
-
-# plt.plot(range(len(loss1)), loss1, label="DeepQ")
-# plt.plot(range(len(loss2)), loss2, label="DeepPolicy")
+# plt.plot(range(len(rewards1)), rewards1, label="DeepQA")
+# plt.plot(range(len(rewards2)), rewards2, label="DeepQ")
 # plt.legend()
-# plt.xlabel('Epoch')
-# plt.ylabel('Loss')
-# plt.savefig("q_vs_policy_loss.png")
+# plt.xlabel('Episode')
+# plt.ylabel('Reward')
+# plt.savefig("qa_vs_q_reward.png")
+
+plt.plot(range(len(loss1)), loss1, label="DeepQA")
+plt.plot(range(len(loss2)), loss2, label="DeepQ")
+plt.legend()
+plt.xlabel('Epoch')
+plt.ylabel('Loss')
+plt.savefig("qa_vs_q_loss.png")

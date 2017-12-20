@@ -109,8 +109,6 @@ for i in range(num_episodes):
             # recurse with belman's equation within the game
             future_reward = y*game_data[zero_len-j+1][2]
             game_data[zero_len-j][2] = game_data[zero_len-j][2] + future_reward
-    print("Game #",i, " steps = ", j ,"last reward", r," finished with headscore ", game_data[0][2])
-
 
     # add data to the experience_replay bank
     for s,a,r in game_data:
